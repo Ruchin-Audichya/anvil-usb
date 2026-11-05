@@ -31,6 +31,14 @@ official ISO straight from Microsoft, writes a bootable installer, and gets out 
 > **Status: beta.** The writing engine is verified end-to-end (details below). Real-device testing across
 > phones and USB drives is ongoing — reports are very welcome.
 
+<p align="center">
+  <img src="marketing/slides/slide-1.png" width="24%" alt="Your laptop just died. Your phone can fix it.">
+  <img src="marketing/slides/slide-4.png" width="24%" alt="Step 1: get the real Windows from Microsoft">
+  <img src="marketing/slides/slide-5.png" width="24%" alt="Step 2: plug in the pendrive and tap Write">
+  <img src="marketing/slides/slide-6.png" width="24%" alt="Step 3: it really boots into Windows 11 Setup">
+</p>
+<p align="center"><sub>Swipe-through overview: <a href="marketing/Anvil-carousel.pdf">Anvil-carousel.pdf</a></sub></p>
+
 ## Why Anvil
 
 | | Anvil | EtchDroid | DriveDroid |

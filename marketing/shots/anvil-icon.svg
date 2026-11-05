@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="128" height="128" role="img" aria-label="Anvil logo">
+  <rect width="108" height="108" rx="24" fill="#1C1917"/>
+  <path fill="#FDE68A" d="M58,24l-7,10h5l-3,8l9,-11h-5l3,-7z"/>
+  <path fill="#F97316" d="M22,46L36,44L84,44L84,54C77,54 72,57 70,63L70,65L77,65L79,76L35,76L37,65L44,65L44,63C42,58 38,55 33,54L28,53C25,52 23,49 22,46Z"/>
+</svg>
