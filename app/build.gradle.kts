@@ -14,16 +14,31 @@ android {
         applicationId = "dev.ruchin.anvil"
         minSdk = 26
         targetSdk = 37
-        versionCode = 3
-        versionName = "0.3.0"
+        versionCode = 4
+        versionName = "0.3.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    // Release signing comes from ~/.gradle/gradle.properties (ANVIL_KEYSTORE, …) so no key ever lives in the repo.
+    val keystorePath = providers.gradleProperty("ANVIL_KEYSTORE").orNull
+    signingConfigs {
+        if (keystorePath != null) create("release") {
+            storeFile = file(keystorePath)
+            storePassword = providers.gradleProperty("ANVIL_KEYSTORE_PASSWORD").get()
+            keyAlias = providers.gradleProperty("ANVIL_KEY_ALIAS").get()
+            keyPassword = providers.gradleProperty("ANVIL_KEY_PASSWORD").get()
+            enableV1Signing = true
+            enableV2Signing = true
+            enableV3Signing = true
+        }
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            // Shrinking stays off until release builds are exercised on devices (R8 + Hilt/serialization).
+            isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.findByName("release")
         }
     }
 

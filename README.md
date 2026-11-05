@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Ruchin-Audichya/anvil-usb/releases/latest/download/Anvil-0.3.0.apk"><b>⬇️ Download the APK (v0.3.0)</b></a>
+  <a href="https://github.com/Ruchin-Audichya/anvil-usb/releases/latest/download/Anvil.apk"><b>⬇️ Download the APK</b></a>
 </p>
 
 ---
@@ -127,11 +127,17 @@ Using a real Windows 11 ISO (build 26300, 8.4 GB) downloaded through Anvil's own
 
 ## Get started
 
-1. [**Download the APK**](https://github.com/Ruchin-Audichya/anvil-usb/releases/latest/download/Anvil-0.3.0.apk) (or browse [Releases](https://github.com/Ruchin-Audichya/anvil-usb/releases)) and install it — allow "Install unknown apps" when Android asks.
+1. [**Download the APK**](https://github.com/Ruchin-Audichya/anvil-usb/releases/latest/download/Anvil.apk) (or browse [Releases](https://github.com/Ruchin-Audichya/anvil-usb/releases)) and install it — allow "Install unknown apps" when Android asks.
 2. Plug a USB drive (16 GB+ for Windows, 8 GB+ for Linux) into your phone with an OTG adapter.
 3. **Download Windows** → choose version & language → **Download** → **Write this ISO to a USB drive**.
    Or **Write an ISO** and pick a file you already have.
 4. Boot your PC from the USB drive (boot menu key: HP F9, Dell F12, Lenovo F12, ASUS Esc/F8, Acer F12).
+
+**If installing is blocked:** Anvil isn't on the Play Store yet, so Android double-checks it.
+- Chrome says *"File might be harmful"* → tap **Download anyway**.
+- Play Protect says *"Unsafe app blocked"* / *"Scan app"* → **More details → Install anyway** (or scan, then install).
+- Samsung: if nothing happens or it says *"Blocked by Auto Blocker"*, turn off **Settings → Security and privacy → Auto Blocker**
+  while installing, then turn it back on.
 
 > ⚠️ Writing erases everything on the USB drive. Anvil asks you to confirm with the drive's name and size.
 
@@ -141,6 +147,7 @@ Requires JDK 17+ and the Android SDK (platform 37).
 
 ```bash
 ./gradlew :app:assembleDebug      # APK → app/build/outputs/apk/debug/
+./gradlew :app:assembleRelease    # signed release APK, if ANVIL_KEYSTORE* is set in ~/.gradle/gradle.properties
 ./gradlew test                    # unit tests (USB protocol, FAT32, WIM split, UDF, downloader, …)
 ./gradlew :core:catalog:liveTest  # resolve real links from Microsoft (network)
 ```
