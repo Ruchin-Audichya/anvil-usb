@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Anvil</string>
+    <string name="back">Back</string>
+    <string name="home_tagline">Forge a bootable Windows or Linux USB drive with just your phone. No PC, no root.</string>
+    <string name="home_linux_title">Write a Linux ISO to USB</string>
+    <string name="home_linux_body">Ubuntu, Mint, Fedora, Debian… from an ISO on your phone</string>
+    <string name="home_windows_title">Download Windows</string>
+    <string name="home_windows_body">Latest official Windows 11 / 10 ISO, straight from Microsoft</string>
+    <string name="home_disclaimer">Anvil downloads only from official sources. Windows requires a valid licence. Writing a USB drive erases everything on it.</string>
+    <string name="no_drive">No USB drive connected</string>
+    <string name="plug_in_drive">Plug a USB pendrive into your phone using a USB OTG adapter (USB‑C or micro‑USB).</string>
+    <string name="drive_connected">Ready. Tap a task below.</string>
+    <string name="no_usb_host">This phone doesn\'t report USB OTG (host) support. It may still work — try plugging the drive in.</string>
+
+    <string name="write_title">Write ISO to USB</string>
+    <string name="step_choose_image">Choose the OS image</string>
+    <string name="step_choose_drive">Choose the USB drive</string>
+    <string name="choose_iso">Choose ISO file</string>
+    <string name="choose_other_iso">Choose a different file</string>
+    <string name="inspecting_image">Checking the image…</string>
+    <string name="kind_bootable">Bootable image — ready to write.</string>
+    <string name="kind_windows">Windows installer ISO. Anvil will create a UEFI-bootable FAT32 drive and split install.wim if it\'s larger than 4 GB.</string>
+    <string name="kind_non_hybrid">This ISO has no USB boot sector, so it will probably not boot from a USB drive.</string>
+    <string name="kind_unknown">Unrecognised file. It doesn\'t look like a bootable ISO or disk image.</string>
+    <string name="write_anyway">Write it anyway (advanced)</string>
+    <string name="tap_to_use_drive">Tap to use this drive</string>
+    <string name="opening_drive">Reading drive details…</string>
+    <string name="drive_write_protected">This drive is write-protected.</string>
+    <string name="drive_too_small">This drive is too small. You need at least %1$s.</string>
+    <string name="battery_low">Battery is at %1$d%%. Plug in your charger — writing a USB drive uses a lot of power.</string>
+    <string name="start_write">Write to USB</string>
+    <string name="erase_title">THIS WILL ERASE %1$s (%2$s)</string>
+    <string name="erase_body">Everything on this USB drive will be permanently deleted and replaced with the OS installer. This can\'t be undone.</string>
+    <string name="erase_understand">I understand, erase this drive</string>
+    <string name="erase_confirm">Erase &amp; write</string>
+    <string name="write_keep_plugged">Keep the USB drive plugged in. You can switch apps or turn off the screen.</string>
+    <string name="write_success">Done! Your USB drive is ready. It\'s safe to unplug it now.</string>
+    <string name="write_cancelled">Cancelled. The USB drive is only partly written and won\'t boot — write it again before using it.</string>
+    <string name="write_failed_recovery">The drive is now partly written. Re-plug it (try a different OTG adapter or USB port if this repeats) and start the write again — it will be fully rewritten.</string>
+
+    <string name="windows_title">Download Windows</string>
+    <string name="step_choose_windows">Choose Windows version</string>
+    <string name="step_download">Download</string>
+    <string name="win11" translatable="false">Windows 11</string>
+    <string name="win10" translatable="false">Windows 10</string>
+    <string name="win11_arm" translatable="false">11 Arm64</string>
+    <string name="contacting_microsoft">Contacting Microsoft…</string>
+    <string name="language">Language</string>
+    <string name="get_official_link">Get official download link</string>
+    <string name="download_size">Size: %1$s</string>
+    <string name="official_hash">Will be verified against Microsoft\'s published SHA-256:</string>
+    <string name="no_official_hash">Microsoft hasn\'t published a checksum for this language; the file will still be checked for completeness.</string>
+    <string name="free_space">Free space on phone: %1$s</string>
+    <string name="not_enough_space">Not enough free space. Free up storage, or use “stream directly to USB” (coming soon).</string>
+    <string name="metered_warning">You\'re on mobile data or a metered network.</string>
+    <string name="metered_title">Use mobile data?</string>
+    <string name="metered_body">This download is %1$s. On mobile data that may cost money or use up your plan. Connect to Wi-Fi if you can.</string>
+    <string name="metered_continue">Download anyway</string>
+    <string name="already_downloaded">You already downloaded this ISO.</string>
+    <string name="verify_existing">Verify downloaded ISO</string>
+    <string name="start_download">Download</string>
+    <string name="download_background_hint">You can leave the app — the download continues and resumes automatically if your connection drops.</string>
+    <string name="download_success">Downloaded and verified.</string>
+    <string name="download_cancelled">Download paused. Open this screen again and tap Download to resume where it stopped.</string>
+    <string name="windows_disclaimer">Downloads come directly from Microsoft\'s servers (software.download.prss.microsoft.com). Anvil never hosts Windows files. You need your own Windows licence to activate.</string>
+
+    <string name="stage_preparing">Preparing</string>
+    <string name="stage_clearing">Clearing old partition data</string>
+    <string name="stage_writing">Writing image</string>
+    <string name="stage_syncing">Syncing</string>
+    <string name="stage_verifying">Verifying</string>
+    <string name="stage_done">Done</string>
+    <string name="stage_connecting">Connecting</string>
+    <string name="stage_downloading">Downloading</string>
+    <string name="stage_waiting_network">Waiting for network…</string>
+    <string name="stage_checksum">Verifying checksum</string>
+    <string name="eta">%1$s left</string>
+
+    <string name="action_cancel">Cancel</string>
+    <string name="action_done">Done</string>
+    <string name="action_close">Close</string>
+    <string name="action_retry">Try again</string>
+    <string name="action_copy_log">Copy debug log</string>
+    <string name="log_copied">Debug log copied</string>
+
+    <string name="channel_progress">Downloads &amp; USB writes</string>
+    <string name="channel_progress_desc">Progress of running downloads and USB writes</string>
+    <string name="channel_result">Finished tasks</string>
+    <string name="notif_write_done">USB drive ready — safe to unplug.</string>
+    <string name="notif_download_done">Download complete and verified.</string>
+    <string name="notif_failed">Failed. Open Anvil for details.</string>
+
+    <string name="stage_reading_iso">Reading the ISO</string>
+    <string name="stage_partitioning">Partitioning</string>
+    <string name="stage_formatting">Formatting FAT32</string>
+    <string name="stage_copying">Copying files</string>
+    <string name="stage_splitting_wim">Splitting install.wim</string>
+    <string name="write_downloaded_to_usb">Write this ISO to a USB drive</string>
+    <string name="advanced_show">Advanced options</string>
+    <string name="advanced_hide">Hide advanced options</string>
+    <string name="partition_scheme">Partition scheme</string>
+    <string name="scheme_gpt">GPT (recommended)</string>
+    <string name="scheme_gpt_desc">For UEFI PCs — every Windows 11 PC and almost all laptops since 2012.</string>
+    <string name="scheme_mbr">MBR</string>
+    <string name="scheme_mbr_desc">For UEFI firmware that won\'t boot GPT USB drives. Legacy BIOS boot isn\'t supported yet.</string>
+
+    <string name="step_customize">Customize Windows Setup</string>
+    <string name="cust_enable">Automate Windows Setup</string>
+    <string name="cust_enable_desc">Adds an answer file to the USB drive. Turn off for a completely stock installer.</string>
+    <string name="cust_bypass">Skip Windows 11 requirements</string>
+    <string name="cust_bypass_desc">Installs on PCs without TPM 2.0, Secure Boot, 4 GB RAM or a supported CPU.</string>
+    <string name="cust_local">Local account, no Microsoft account</string>
+    <string name="cust_local_desc">Setup works offline and creates this account for you.</string>
+    <string name="cust_username">User name</string>
+    <string name="cust_username_invalid">Up to 20 characters, no special symbols, not a reserved name.</string>
+    <string name="cust_password">Password (optional)</string>
+    <string name="cust_password_hint">Leave empty to set it at first sign-in. A password typed here is stored in plain text on the USB drive.</string>
+    <string name="cust_privacy">Skip privacy questions</string>
+    <string name="cust_privacy_desc">Answers them with the most private options (location, diagnostics, ads off).</string>
+    <string name="cust_telemetry">Reduce telemetry and ads</string>
+    <string name="cust_telemetry_desc">Minimum diagnostic data, no advertising ID, no sponsored apps auto-installed.</string>
+    <string name="cust_bitlocker">Don\'t auto-encrypt with BitLocker</string>
+    <string name="cust_bitlocker_desc">Avoids surprise \"recovery key\" lockouts. You can still turn BitLocker on later.</string>
+    <string name="cust_bloat">Remove preinstalled promo apps</string>
+    <string name="cust_bloat_desc">Clipchamp, News, Weather, Solitaire, Teams, Copilot, Outlook (new) and similar. Store, Photos and Xbox stay.</string>
+    <string name="cust_region">Use this phone\'s region and time zone</string>
+    <string name="cust_keyboard">keyboard %1$s</string>
+</resources>

@@ -1,0 +1,15 @@
+
+*.aab
+*.apk
+build/
+captures/
+.cxx/
+dist/
+.externalNativeBuild/
+.gradle/
+.idea/
+*.img
+*.iml
+*.iso
+.kotlin/
+local.properties

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bf_background">#FFFFF8F5</color>
+    <color name="bf_icon_bg">#FF1C1917</color>
+    <color name="bf_icon_fg">#FFF97316</color>
+    <color name="bf_icon_spark">#FFFDE68A</color>
+</resources>
