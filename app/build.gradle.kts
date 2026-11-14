@@ -14,9 +14,23 @@ android {
         applicationId = "dev.ruchin.anvil"
         minSdk = 26
         targetSdk = 37
-        versionCode = 4
-        versionName = "0.3.1"
+        versionCode = 5
+        versionName = "0.4.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    // Distribution channels. The Galaxy Store build hides the Windows 11 hardware-requirement bypass
+    // (store-review risk); the GitHub build keeps it.
+    flavorDimensions += "store"
+    productFlavors {
+        create("github") {
+            dimension = "store"
+            buildConfigField("boolean", "ALLOW_HW_BYPASS", "true")
+        }
+        create("galaxy") {
+            dimension = "store"
+            buildConfigField("boolean", "ALLOW_HW_BYPASS", "false")
+        }
     }
 
     // Release signing comes from ~/.gradle/gradle.properties (ANVIL_KEYSTORE, …) so no key ever lives in the repo.

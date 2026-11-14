@@ -39,7 +39,7 @@ data class BatteryStatus(val percent: Int, val charging: Boolean) {
 /** Windows Setup customisation as edited in the UI. */
 data class CustomizeUi(
     val enabled: Boolean = true,
-    val bypass: Boolean = true,
+    val bypass: Boolean = dev.ruchin.anvil.app.BuildConfig.ALLOW_HW_BYPASS,
     val localAccount: Boolean = true,
     val userName: String = "User",
     val password: String = "",
@@ -53,7 +53,7 @@ data class CustomizeUi(
     val userNameValid get() = !localAccount || dev.ruchin.anvil.unattend.LocalAccount.isValidName(userName)
 
     fun toOptions(): dev.ruchin.anvil.unattend.UnattendOptions? = if (!enabled) null else dev.ruchin.anvil.unattend.UnattendOptions(
-        bypassHardwareChecks = bypass,
+        bypassHardwareChecks = bypass && dev.ruchin.anvil.app.BuildConfig.ALLOW_HW_BYPASS,
         localAccount = if (localAccount) dev.ruchin.anvil.unattend.LocalAccount(userName.trim(), password) else null,
         skipOnlineAccount = localAccount,
         skipPrivacyQuestions = skipPrivacy,

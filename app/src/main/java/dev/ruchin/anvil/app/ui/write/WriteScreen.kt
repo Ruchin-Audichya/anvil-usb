@@ -171,7 +171,9 @@ private fun CustomizeCard(c: CustomizeUi, update: ((CustomizeUi) -> CustomizeUi)
         ToggleRow(stringResource(R.string.cust_enable), stringResource(R.string.cust_enable_desc), c.enabled) { v -> update { it.copy(enabled = v) } }
         if (!c.enabled) return@SectionCard
         androidx.compose.material3.HorizontalDivider()
-        ToggleRow(stringResource(R.string.cust_bypass), stringResource(R.string.cust_bypass_desc), c.bypass) { v -> update { it.copy(bypass = v) } }
+        if (dev.ruchin.anvil.app.BuildConfig.ALLOW_HW_BYPASS) {
+            ToggleRow(stringResource(R.string.cust_bypass), stringResource(R.string.cust_bypass_desc), c.bypass) { v -> update { it.copy(bypass = v) } }
+        }
         ToggleRow(stringResource(R.string.cust_local), stringResource(R.string.cust_local_desc), c.localAccount) { v -> update { it.copy(localAccount = v) } }
         if (c.localAccount) {
             androidx.compose.material3.OutlinedTextField(

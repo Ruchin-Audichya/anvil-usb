@@ -1,0 +1,3 @@
+• New release signing key: if you installed v0.3.x from GitHub, uninstall it once before installing 0.4.0
+• Store-ready build variants and listing metadata
+• Privacy policy added (docs/PRIVACY.md)

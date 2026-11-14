@@ -1,0 +1,21 @@
+Your PC won't boot and you need an install USB, but there's no second computer around. Anvil turns your Android phone into a bootable-USB maker.
+
+Plug a USB drive into your phone (OTG adapter or USB-C drive), pick an image, and Anvil writes a drive that boots on UEFI PCs. No PC. No root.
+
+<b>What it does</b>
+<ul>
+<li>Windows 10 &amp; 11 installers: download the ISO straight from Microsoft's official servers inside the app, or pick one you already have</li>
+<li>Handles the 7+ GB install.wim: automatically split for FAT32 so the drive boots on UEFI with Secure Boot on</li>
+<li>Linux: write Ubuntu, Fedora, Mint, Debian and other hybrid ISOs directly</li>
+<li>Verifies every write with a SHA-256 read-back</li>
+<li>Optional Windows Setup helpers: local account, skip privacy screens, keep BitLocker off, and an optional switch to skip the Windows 11 hardware check (TPM/Secure Boot/CPU) for older PCs</li>
+<li>Runs in the background with progress notifications</li>
+</ul>
+
+<b>Why it works without root</b>
+Android doesn't allow apps to write raw disks, so Anvil talks to the drive itself over the USB Mass Storage protocol, with its own GPT partition and FAT32 writers.
+
+<b>Privacy</b>
+No accounts, no ads, no analytics. Images are downloaded only from official sources when you ask.
+
+Writing erases everything on the selected USB drive. Anvil always asks you to confirm first.

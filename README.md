@@ -141,6 +141,8 @@ Using a real Windows 11 ISO (build 26300, 8.4 GB) downloaded through Anvil's own
    Or **Write an ISO** and pick a file you already have.
 4. Boot your PC from the USB drive (boot menu key: HP F9, Dell F12, Lenovo F12, ASUS Esc/F8, Acer F12).
 
+**Updating from v0.3.x?** v0.4.0 is signed with a new release key, so uninstall the old version once before installing it. Future updates install over the top as normal.
+
 **If installing is blocked:** Anvil isn't on the Play Store yet, so Android double-checks it.
 - Chrome says *"File might be harmful"* → tap **Download anyway**.
 - Play Protect says *"Unsafe app blocked"* / *"Scan app"* → **More details → Install anyway** (or scan, then install).
