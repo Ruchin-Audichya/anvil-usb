@@ -8,6 +8,7 @@ import android.hardware.usb.UsbInterface
 import android.hardware.usb.UsbManager
 import android.os.Build
 import dev.ruchin.anvil.blockdev.UsbBulkTransport
+import dev.ruchin.anvil.blockdev.UsbTuning
 import dev.ruchin.anvil.common.AnvilException
 import dev.ruchin.anvil.common.DebugLog
 
@@ -23,10 +24,9 @@ class AndroidUsbTransport private constructor(
     private val intf: UsbInterface,
     private val inEp: UsbEndpoint,
     private val outEp: UsbEndpoint,
+    /** From [UsbTuning]: 16 KiB before Android 9 (bulkTransfer's silent cap) and in compatibility mode. */
+    override val maxTransferSize: Int,
 ) : UsbBulkTransport {
-
-    // Before Android 9, UsbDeviceConnection.bulkTransfer silently capped transfers at 16 KiB.
-    override val maxTransferSize: Int = if (Build.VERSION.SDK_INT >= 28) 128 * 1024 else 16 * 1024
 
     @Volatile private var closed = false
 
@@ -72,7 +72,7 @@ class AndroidUsbTransport private constructor(
                     (it.interfaceSubclass == 6 || it.interfaceSubclass == 0) // some sticks report 0
             }
 
-        fun open(manager: UsbManager, device: UsbDevice): AndroidUsbTransport {
+        fun open(manager: UsbManager, device: UsbDevice, tuning: UsbTuning = UsbTuning.forAndroid(Build.VERSION.SDK_INT, false)): AndroidUsbTransport {
             val intf = findMassStorageInterface(device)
                 ?: throw AnvilException("This USB device isn't a USB flash drive (no mass-storage interface).")
             var inEp: UsbEndpoint? = null
@@ -89,10 +89,11 @@ class AndroidUsbTransport private constructor(
                 conn.close()
                 throw AnvilException("Couldn't take control of the USB drive. Close other apps using it and re-plug.")
             }
-            DebugLog.i("UsbTransport", "opened ${device.deviceName} vid=%04x pid=%04x in=0x%02x(%d) out=0x%02x(%d)".format(
+            DebugLog.i("UsbTransport", "opened ${device.deviceName} vid=%04x pid=%04x in=0x%02x(%d) out=0x%02x(%d) transfer=%d command=%d".format(
                 device.vendorId, device.productId, inEp.address, inEp.maxPacketSize, outEp.address, outEp.maxPacketSize,
+                tuning.maxTransferBytes, tuning.maxCommandBytes,
             ))
-            return AndroidUsbTransport(manager, device, conn, intf, inEp, outEp)
+            return AndroidUsbTransport(manager, device, conn, intf, inEp, outEp, tuning.maxTransferBytes)
         }
     }
 }

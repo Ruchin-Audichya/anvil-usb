@@ -1,0 +1,157 @@
+{
+  "schema": 1,
+  "updated": "2026-11-15",
+  "entries": [
+    {
+      "id": "ubuntu-lts-desktop",
+      "distro": "ubuntu",
+      "distroName": "Ubuntu",
+      "edition": "Desktop LTS",
+      "version": "26.04 LTS",
+      "arch": "amd64",
+      "mirrors": [
+        "https://releases.ubuntu.com",
+        "https://mirrors.layeronline.com/ubuntu-releases",
+        "https://ubuntu.mirror.garr.it/ubuntu-releases",
+        "https://mirror.aarnet.edu.au/pub/ubuntu/releases",
+        "https://mirrors.kernel.org/ubuntu-releases",
+        "https://ftp.halifax.rwth-aachen.de/ubuntu-releases"
+      ],
+      "isoPath": "26.04/ubuntu-{version}-desktop-amd64.iso",
+      "checksumUrl": "26.04/SHA256SUMS",
+      "signatureUrl": "26.04/SHA256SUMS.gpg",
+      "keyId": "ubuntu-cdimage",
+      "approxSizeMb": 6200,
+      "description": "Long-term support: updates until 2031. The safe choice."
+    },
+    {
+      "id": "ubuntu-latest-desktop",
+      "distro": "ubuntu",
+      "distroName": "Ubuntu",
+      "edition": "Desktop (latest)",
+      "version": "26.10",
+      "arch": "amd64",
+      "mirrors": [
+        "https://releases.ubuntu.com",
+        "https://mirrors.layeronline.com/ubuntu-releases",
+        "https://ubuntu.mirror.garr.it/ubuntu-releases",
+        "https://mirror.aarnet.edu.au/pub/ubuntu/releases",
+        "https://mirrors.kernel.org/ubuntu-releases",
+        "https://ftp.halifax.rwth-aachen.de/ubuntu-releases"
+      ],
+      "isoPath": "26.10/ubuntu-{version}-desktop-amd64.iso",
+      "checksumUrl": "26.10/SHA256SUMS",
+      "signatureUrl": "26.10/SHA256SUMS.gpg",
+      "keyId": "ubuntu-cdimage",
+      "approxSizeMb": 6300,
+      "description": "Newest features, supported for 9 months."
+    },
+    {
+      "id": "mint-cinnamon",
+      "distro": "mint",
+      "distroName": "Linux Mint",
+      "edition": "Cinnamon",
+      "version": "22.3",
+      "arch": "amd64",
+      "mirrors": [
+        "https://mirrors.edge.kernel.org/linuxmint",
+        "https://mirrors.nxtgen.com/linuxmint-mirror/iso",
+        "https://mirror.rackspace.com/linuxmint/iso",
+        "https://mirrors.layeronline.com/linuxmint",
+        "https://mirror.aarnet.edu.au/pub/linuxmint",
+        "https://mirrors.kernel.org/linuxmint"
+      ],
+      "isoPath": "stable/22.3/linuxmint-{version}-cinnamon-64bit.iso",
+      "checksumUrl": "stable/22.3/sha256sum.txt",
+      "signatureUrl": "stable/22.3/sha256sum.txt.gpg",
+      "keyId": "linuxmint-iso",
+      "approxSizeMb": 2950,
+      "description": "Familiar Windows-like desktop. Great first Linux."
+    },
+    {
+      "id": "mint-xfce",
+      "distro": "mint",
+      "distroName": "Linux Mint",
+      "edition": "Xfce",
+      "version": "22.3",
+      "arch": "amd64",
+      "mirrors": [
+        "https://mirrors.edge.kernel.org/linuxmint",
+        "https://mirrors.nxtgen.com/linuxmint-mirror/iso",
+        "https://mirror.rackspace.com/linuxmint/iso",
+        "https://mirrors.layeronline.com/linuxmint",
+        "https://mirror.aarnet.edu.au/pub/linuxmint",
+        "https://mirrors.kernel.org/linuxmint"
+      ],
+      "isoPath": "stable/22.3/linuxmint-{version}-xfce-64bit.iso",
+      "checksumUrl": "stable/22.3/sha256sum.txt",
+      "signatureUrl": "stable/22.3/sha256sum.txt.gpg",
+      "keyId": "linuxmint-iso",
+      "approxSizeMb": 2900,
+      "description": "Lighter desktop for older laptops."
+    },
+    {
+      "id": "fedora-workstation",
+      "distro": "fedora",
+      "distroName": "Fedora",
+      "edition": "Workstation",
+      "version": "45",
+      "arch": "x86_64",
+      "mirrors": [
+        "https://dl.fedoraproject.org/pub/fedora/linux/releases",
+        "https://mirrors.kernel.org/fedora/releases",
+        "https://ftp.halifax.rwth-aachen.de/fedora/linux/releases",
+        "https://mirror.aarnet.edu.au/pub/fedora/linux/releases",
+        "https://fedora.mirror.garr.it/fedora/linux/releases",
+        "https://mirrors.layeronline.com/fedora/releases"
+      ],
+      "isoPath": "45/Workstation/x86_64/iso/Fedora-Workstation-Live-{version}.x86_64.iso",
+      "checksumUrl": "45/Workstation/x86_64/iso/Fedora-Workstation-45-1.4-x86_64-CHECKSUM",
+      "keyId": "fedora-45",
+      "approxSizeMb": 2800,
+      "description": "Latest GNOME, upstream-first. Popular with developers."
+    },
+    {
+      "id": "debian-netinst",
+      "distro": "debian",
+      "distroName": "Debian",
+      "edition": "netinst",
+      "version": "13",
+      "arch": "amd64",
+      "mirrors": [
+        "https://cdimage.debian.org/debian-cd",
+        "https://mirrors.kernel.org/debian-cd",
+        "https://mirror.aarnet.edu.au/pub/debian-cd",
+        "https://mirrors.layeronline.com/debian-cd",
+        "https://ftp.acc.umu.se/debian-cd"
+      ],
+      "isoPath": "current/amd64/iso-cd/debian-{version}-amd64-netinst.iso",
+      "checksumUrl": "current/amd64/iso-cd/SHA256SUMS",
+      "signatureUrl": "current/amd64/iso-cd/SHA256SUMS.sign",
+      "keyId": "debian-cd",
+      "approxSizeMb": 760,
+      "description": "Small installer; downloads the rest during setup (needs internet on the PC)."
+    },
+    {
+      "id": "debian-live-gnome",
+      "distro": "debian",
+      "distroName": "Debian",
+      "edition": "Live (GNOME)",
+      "version": "13",
+      "arch": "amd64",
+      "mirrors": [
+        "https://cdimage.debian.org/debian-cd",
+        "https://mirrors.kernel.org/debian-cd",
+        "https://mirror.aarnet.edu.au/pub/debian-cd",
+        "https://mirrors.layeronline.com/debian-cd",
+        "https://ftp.acc.umu.se/debian-cd"
+      ],
+      "isoPath": "current-live/amd64/iso-hybrid/debian-live-{version}-amd64-gnome.iso",
+      "checksumUrl": "current-live/amd64/iso-hybrid/SHA256SUMS",
+      "signatureUrl": "current-live/amd64/iso-hybrid/SHA256SUMS.sign",
+      "keyId": "debian-cd",
+      "approxSizeMb": 3650,
+      "description": "Try Debian without installing, then install from the desktop."
+    }
+  ]
+}

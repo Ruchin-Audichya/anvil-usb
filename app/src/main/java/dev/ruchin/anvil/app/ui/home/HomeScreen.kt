@@ -14,6 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material.icons.filled.Usb
 import androidx.compose.material.icons.filled.Warning
@@ -50,11 +51,22 @@ class HomeViewModel @Inject constructor(val drives: UsbDriveRepository, val jobs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(onWrite: () -> Unit, onWindows: () -> Unit, vm: HomeViewModel = hiltViewModel()) {
+fun HomeScreen(onWrite: () -> Unit, onWindows: () -> Unit, onLinux: () -> Unit, onSettings: () -> Unit, vm: HomeViewModel = hiltViewModel()) {
     val drives by vm.drives.drives.collectAsStateWithLifecycle()
     val job by vm.jobs.state.collectAsStateWithLifecycle()
 
-    Scaffold(topBar = { LargeTopAppBar(title = { Text(stringResource(R.string.app_name)) }) }) { padding ->
+    Scaffold(
+        topBar = {
+            LargeTopAppBar(
+                title = { Text(stringResource(R.string.app_name)) },
+                actions = {
+                    androidx.compose.material3.IconButton(onClick = onSettings) {
+                        Icon(Icons.Filled.Settings, stringResource(R.string.settings_title))
+                    }
+                },
+            )
+        },
+    ) { padding ->
         Column(
             Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -64,7 +76,7 @@ fun HomeScreen(onWrite: () -> Unit, onWindows: () -> Unit, vm: HomeViewModel = h
             if (!vm.drives.hasUsbHost) Notice(Icons.Filled.Warning, stringResource(R.string.no_usb_host), MaterialTheme.colorScheme.error)
 
             job?.takeIf { it.isActive }?.let { j ->
-                Card(onClick = if (j.kind == JobKind.WRITE_USB) onWrite else onWindows, modifier = Modifier.fillMaxWidth()) {
+                Card(onClick = when { j.kind == JobKind.WRITE_USB -> onWrite; j.linux -> onLinux; else -> onWindows }, modifier = Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(j.title, style = MaterialTheme.typography.titleSmall)
                         LinearProgressIndicator(progress = { j.fraction }, modifier = Modifier.fillMaxWidth())
@@ -90,8 +102,9 @@ fun HomeScreen(onWrite: () -> Unit, onWindows: () -> Unit, vm: HomeViewModel = h
                 }
             }
 
-            ActionCard(Icons.Filled.Terminal, stringResource(R.string.home_linux_title), stringResource(R.string.home_linux_body), onWrite)
+            ActionCard(Icons.Filled.Terminal, stringResource(R.string.home_linux_dl_title), stringResource(R.string.home_linux_dl_body), onLinux)
             ActionCard(Icons.Filled.Download, stringResource(R.string.home_windows_title), stringResource(R.string.home_windows_body), onWindows)
+            ActionCard(Icons.Filled.Usb, stringResource(R.string.home_linux_title), stringResource(R.string.home_linux_body), onWrite)
 
             Text(stringResource(R.string.home_disclaimer), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }

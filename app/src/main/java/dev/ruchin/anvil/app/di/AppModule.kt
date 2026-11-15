@@ -1,5 +1,10 @@
 package dev.ruchin.anvil.app.di
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.ruchin.anvil.catalog.linux.LinuxIsoResolver
+import dev.ruchin.anvil.catalog.linux.LinuxManifestSource
+import dev.ruchin.anvil.catalog.linux.PinnedKeys
 import dev.ruchin.anvil.catalog.windows.MicrosoftIsoResolver
 import dev.ruchin.anvil.download.ResumableDownloader
 import dev.ruchin.anvil.writer.RawImageWriter
@@ -33,4 +38,14 @@ object AppModule {
 
     @Provides @Singleton
     fun msResolver(client: OkHttpClient): MicrosoftIsoResolver = MicrosoftIsoResolver(client)
+
+    @Provides @Singleton
+    fun pinnedKeys(): PinnedKeys = PinnedKeys.load()
+
+    @Provides @Singleton
+    fun linuxManifestSource(@ApplicationContext context: Context, client: OkHttpClient, keys: PinnedKeys): LinuxManifestSource =
+        LinuxManifestSource(client, bundled = { context.assets.open("linux-manifest.json").bufferedReader().use { it.readText() } }, keys = keys)
+
+    @Provides @Singleton
+    fun linuxResolver(client: OkHttpClient, keys: PinnedKeys): LinuxIsoResolver = LinuxIsoResolver(client, keys)
 }

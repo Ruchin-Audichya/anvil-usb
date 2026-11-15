@@ -88,3 +88,27 @@ class ScsiBlockDeviceTest {
         assertThat(Scsi.parseSense(desc).isMediumNotPresent).isTrue()
     }
 }
+
+class UsbTuningTest {
+    @Test
+    fun `compatibility mode uses 16 KiB transfers and 64 KiB commands`() {
+        assertThat(UsbTuning.forAndroid(35, compatibilityMode = true)).isEqualTo(UsbTuning(16 * 1024, 64 * 1024))
+        assertThat(UsbTuning.forAndroid(35, compatibilityMode = false)).isEqualTo(UsbTuning.DEFAULT)
+        assertThat(UsbTuning.forAndroid(26, compatibilityMode = false).maxTransferBytes).isEqualTo(16 * 1024)
+    }
+
+    @Test
+    fun `a compatibility-mode device round-trips data in small commands`() {
+        val tuning = UsbTuning.COMPATIBILITY
+        val stick = FakeUsbStick(blockCount = 4096, maxTransferSize = tuning.maxTransferBytes)
+        val dev = ScsiBlockDevice.open(stick, maxCommandBytes = tuning.maxCommandBytes)
+        val data = Random(3).nextBytes(512 * 1000)
+        dev.write(5, data, 0, 1000)
+        val back = ByteArray(data.size)
+        dev.read(5, back, 0, 1000)
+        assertThat(back).isEqualTo(data)
+        // 64 KiB per command = 128 blocks: 1000 blocks need 8 WRITE(10) commands
+        assertThat(dev.maxBlocksPerTransfer).isEqualTo(128)
+        assertThat(stick.commandLog.count { it == Scsi.WRITE_10 }).isEqualTo(8)
+    }
+}

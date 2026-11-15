@@ -2,8 +2,8 @@
 <resources>
     <string name="back">वापस</string>
     <string name="home_tagline">सिर्फ़ अपने फ़ोन से बूट होने वाली Windows या Linux USB ड्राइव बनाएँ। न PC चाहिए, न root।</string>
-    <string name="home_linux_title">Linux ISO को USB पर लिखें</string>
-    <string name="home_linux_body">Ubuntu, Mint, Fedora, Debian… आपके फ़ोन में रखी ISO से</string>
+    <string name="home_linux_title">पहले से मौजूद ISO लिखें</string>
+    <string name="home_linux_body">आपके फ़ोन में रखी कोई भी Linux या Windows ISO</string>
     <string name="home_windows_title">Windows डाउनलोड करें</string>
     <string name="home_windows_body">नवीनतम आधिकारिक Windows 11 / 10 ISO, सीधे Microsoft से</string>
     <string name="home_disclaimer">Anvil केवल आधिकारिक स्रोतों से डाउनलोड करता है। Windows के लिए वैध लाइसेंस ज़रूरी है। USB ड्राइव पर लिखने से उस पर मौजूद सब कुछ मिट जाता है।</string>
@@ -122,4 +122,39 @@
     <string name="cust_bloat_desc">Clipchamp, News, Weather, Solitaire, Teams, Copilot, Outlook (नया) जैसे ऐप। Store, Photos और Xbox रहेंगे।</string>
     <string name="cust_region">इस फ़ोन का क्षेत्र और टाइम ज़ोन इस्तेमाल करें</string>
     <string name="cust_keyboard">कीबोर्ड %1$s</string>
+    <!-- 0.5.0: Linux catalog -->
+    <string name="home_linux_dl_title">Linux डाउनलोड करें</string>
+    <string name="home_linux_dl_body">Ubuntu, Mint, Fedora या Debian, आधिकारिक मिरर से, सिग्नेचर-जाँच के साथ</string>
+    <string name="linux_title">Linux डाउनलोड करें</string>
+    <string name="step_choose_distro">डिस्ट्रो चुनें</string>
+    <string name="step_choose_edition">एडिशन चुनें</string>
+    <string name="loading_catalog">Linux सूची लोड हो रही है…</string>
+    <string name="catalog_bundled">ऐप में मौजूद सूची दिखाई जा रही है (ऑनलाइन सूची तक पहुँच नहीं हो सकी)।</string>
+    <string name="edition_size">लगभग %1$s</string>
+    <string name="verify_and_find_mirror">सिग्नेचर जाँचें और सबसे तेज़ मिरर खोजें</string>
+    <string name="checking_signature">आधिकारिक सिग्नेचर जाँचा जा रहा है और मिरर परखे जा रहे हैं…</string>
+    <string name="signature_verified">चेकसम सूची पर %1$s के हस्ताक्षर सही हैं। डाउनलोड इस SHA-256 से जाँचा जाएगा:</string>
+    <string name="fastest_mirror">सबसे तेज़ मिरर: %1$s (%2$s)</string>
+    <string name="mirrors_available">%1$d मिरर काम कर रहे हैं। कोई बंद हो तो Anvil अपने-आप अगले पर चला जाता है।</string>
+    <string name="linux_disclaimer">ISO सीधे हर प्रोजेक्ट के आधिकारिक सर्वर और मिरर से आती है। Anvil चेकसम सूची पर डिस्ट्रो का सिग्नेचर और ISO का SHA-256 जाँचता है, और इनमें से कोई भी जाँच फ़ेल हो तो फ़ाइल कभी नहीं लिखता।</string>
+    <string name="stage_signature">सिग्नेचर जाँचा गया</string>
+    <string name="verified_badge">सिग्नेचर + चेकसम सत्यापित</string>
+
+    <!-- 0.5.0: drivers folder -->
+    <string name="drivers_title">ड्राइवर फ़ोल्डर जोड़ें</string>
+    <string name="drivers_desc">कोई फ़ोल्डर USB ड्राइव के \Drivers में कॉपी करता है, जैसे आपके लैपटॉप का Intel RST स्टोरेज ड्राइवर।</string>
+    <string name="drivers_pick">फ़ोल्डर चुनें</string>
+    <string name="drivers_change">दूसरा फ़ोल्डर चुनें</string>
+    <string name="drivers_reading">फ़ोल्डर पढ़ा जा रहा है…</string>
+    <string name="drivers_summary">%1$s · %2$d फ़ाइलें · %3$s</string>
+    <string name="drivers_needed">ड्राइवर फ़ोल्डर चुनें, या यह विकल्प बंद करें।</string>
+    <string name="drivers_help_title">अगर Setup कहे “No drivers were found”</string>
+    <string name="drivers_help_body">Intel RST/VMD स्टोरेज वाले लैपटॉप (कई 11th gen Intel और नए) Windows Setup से डिस्क छिपा लेते हैं। इनमें से एक करें:\n• BIOS में SATA मोड को AHCI करें या VMD बंद करें, या\n• Setup में Load driver → Browse दबाएँ और इस USB ड्राइव का \Drivers खोलें।</string>
+    <string name="drivers_help_body_none">Intel RST/VMD स्टोरेज वाले लैपटॉप (कई 11th gen Intel और नए) Windows Setup से डिस्क छिपा लेते हैं। इनमें से एक करें:\n• BIOS में SATA मोड को AHCI करें या VMD बंद करें, या\n• “ड्राइवर फ़ोल्डर जोड़ें” चालू करके ड्राइव फिर से लिखें, अपने लैपटॉप का Intel RST ड्राइवर चुनें, फिर Setup में Load driver → Browse → \Drivers खोलें।</string>
+
+    <!-- 0.5.0: settings -->
+    <string name="settings_title">सेटिंग्स</string>
+    <string name="compat_title">संगतता मोड</string>
+    <string name="compat_desc">छोटे 16 KiB USB ट्रांसफ़र इस्तेमाल करता है। धीमा है, लेकिन उन फ़ोन, OTG हब और USB ड्राइव के लिए मददगार जो लिखते समय डिस्कनेक्ट या फ़ेल हो जाते हैं।</string>
+    <string name="compat_on_notice">संगतता मोड चालू है: लिखना धीमा लेकिन ज़्यादा भरोसेमंद होगा।</string>
 </resources>

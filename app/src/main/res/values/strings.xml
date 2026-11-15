@@ -3,8 +3,8 @@
     <string name="app_name" translatable="false">Anvil</string>
     <string name="back">Back</string>
     <string name="home_tagline">Forge a bootable Windows or Linux USB drive with just your phone. No PC, no root.</string>
-    <string name="home_linux_title">Write a Linux ISO to USB</string>
-    <string name="home_linux_body">Ubuntu, Mint, Fedora, Debian… from an ISO on your phone</string>
+    <string name="home_linux_title">Write an ISO you already have</string>
+    <string name="home_linux_body">Any Linux or Windows ISO on your phone</string>
     <string name="home_windows_title">Download Windows</string>
     <string name="home_windows_body">Latest official Windows 11 / 10 ISO, straight from Microsoft</string>
     <string name="home_disclaimer">Anvil downloads only from official sources. Windows requires a valid licence. Writing a USB drive erases everything on it.</string>
@@ -126,4 +126,39 @@
     <string name="cust_bloat_desc">Clipchamp, News, Weather, Solitaire, Teams, Copilot, Outlook (new) and similar. Store, Photos and Xbox stay.</string>
     <string name="cust_region">Use this phone\'s region and time zone</string>
     <string name="cust_keyboard">keyboard %1$s</string>
+    <!-- 0.5.0: Linux catalog -->
+    <string name="home_linux_dl_title">Download Linux</string>
+    <string name="home_linux_dl_body">Ubuntu, Mint, Fedora or Debian from official mirrors, signature-checked</string>
+    <string name="linux_title">Download Linux</string>
+    <string name="step_choose_distro">Choose a distro</string>
+    <string name="step_choose_edition">Choose the edition</string>
+    <string name="loading_catalog">Loading the Linux catalog…</string>
+    <string name="catalog_bundled">Showing the catalog built into the app (the online catalog couldn\'t be reached).</string>
+    <string name="edition_size">about %1$s</string>
+    <string name="verify_and_find_mirror">Check signature &amp; find fastest mirror</string>
+    <string name="checking_signature">Checking the official signature and testing mirrors…</string>
+    <string name="signature_verified">Checksum list signed by %1$s. The download will be checked against this SHA-256:</string>
+    <string name="fastest_mirror">Fastest mirror: %1$s (%2$s)</string>
+    <string name="mirrors_available">%1$d working mirrors. If one fails, Anvil switches to the next automatically.</string>
+    <string name="linux_disclaimer">ISOs come straight from each project\'s official servers and mirrors. Anvil checks the distro\'s signature on the checksum list and the SHA-256 of the ISO, and never writes a file that fails either check.</string>
+    <string name="stage_signature">Signature checked</string>
+    <string name="verified_badge">Signature + checksum verified</string>
+
+    <!-- 0.5.0: drivers folder -->
+    <string name="drivers_title">Add drivers folder</string>
+    <string name="drivers_desc">Copies a folder to \Drivers on the USB drive, for example your laptop\'s Intel RST storage driver.</string>
+    <string name="drivers_pick">Choose folder</string>
+    <string name="drivers_change">Choose a different folder</string>
+    <string name="drivers_reading">Reading the folder…</string>
+    <string name="drivers_summary">%1$s · %2$d files · %3$s</string>
+    <string name="drivers_needed">Choose the drivers folder, or turn this option off.</string>
+    <string name="drivers_help_title">If Setup says “No drivers were found”</string>
+    <string name="drivers_help_body">Laptops with Intel RST/VMD storage (many 11th gen Intel and newer) hide the disk from Windows Setup. Either:\n• In the BIOS, set SATA mode to AHCI or disable VMD, or\n• In Setup, tap Load driver → Browse and open \Drivers on this USB drive.</string>
+    <string name="drivers_help_body_none">Laptops with Intel RST/VMD storage (many 11th gen Intel and newer) hide the disk from Windows Setup. Either:\n• In the BIOS, set SATA mode to AHCI or disable VMD, or\n• Write the drive again with “Add drivers folder” on, pick your laptop\'s Intel RST driver, then in Setup tap Load driver → Browse → \Drivers.</string>
+
+    <!-- 0.5.0: settings -->
+    <string name="settings_title">Settings</string>
+    <string name="compat_title">Compatibility mode</string>
+    <string name="compat_desc">Uses small 16 KiB USB transfers. Slower, but helps with phones, OTG hubs and USB drives that disconnect or fail mid-write.</string>
+    <string name="compat_on_notice">Compatibility mode is on: writing is slower but more reliable.</string>
 </resources>

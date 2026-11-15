@@ -8,7 +8,9 @@ import android.os.BatteryManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.ruchin.anvil.app.jobs.JobManager
+import dev.ruchin.anvil.app.settings.AppSettings
 import dev.ruchin.anvil.app.source.ContentUriImageSource
+import dev.ruchin.anvil.app.source.PickedFolder
 import dev.ruchin.anvil.app.usb.OpenedDrive
 import dev.ruchin.anvil.app.usb.UsbDrive
 import dev.ruchin.anvil.app.usb.UsbDriveRepository
@@ -76,12 +78,18 @@ data class WriteUiState(
     val battery: BatteryStatus? = null,
     val scheme: PartitionScheme = PartitionScheme.GPT,
     val customize: CustomizeUi = CustomizeUi(region = detectRegion()),
+    /** "Add drivers folder" (Windows only): copied to \Drivers for Intel RST/VMD laptops. */
+    val addDrivers: Boolean = false,
+    val driversFolder: PickedFolder? = null,
+    val readingDrivers: Boolean = false,
+    val driversError: String? = null,
 ) {
+    val driversReady get() = !isWindows || !addDrivers || driversFolder != null
     val isWindows get() = image?.info?.kind == ImageKind.WINDOWS_ISO
     val fits get() = image != null && opened != null && image.source.sizeBytes <= opened.sizeBytes
     val imageAcceptable get() = image != null && (image.info.rawWritable || isWindows || writeAnyway)
     val canStart get() = imageAcceptable && fits && opened?.blockDevice?.identity?.writeProtected == false &&
-        (!isWindows || !customize.enabled || customize.userNameValid)
+        (!isWindows || !customize.enabled || customize.userNameValid) && driversReady
 }
 
 @HiltViewModel
@@ -89,6 +97,7 @@ class WriteViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val drives: UsbDriveRepository,
     val jobs: JobManager,
+    val settings: AppSettings,
     savedState: SavedStateHandle,
 ) : ViewModel() {
     private val _ui = MutableStateFlow(WriteUiState(battery = readBattery()))
@@ -154,6 +163,30 @@ class WriteViewModel @Inject constructor(
 
     fun setWriteAnyway(v: Boolean) = _ui.update { it.copy(writeAnyway = v) }
 
+    fun setAddDrivers(v: Boolean) = _ui.update { it.copy(addDrivers = v, driversError = null) }
+
+    /** SAF folder picked for "Add drivers folder": list its files (sizes are needed to plan the FAT32 layout). */
+    fun onDriversPicked(treeUri: Uri) {
+        runCatching { context.contentResolver.takePersistableUriPermission(treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+        _ui.update { it.copy(readingDrivers = true, driversError = null) }
+        viewModelScope.launch {
+            try {
+                val folder = withContext(Dispatchers.IO) { PickedFolder.read(context, treeUri) }
+                if (folder.files.isEmpty()) throw AnvilException("That folder has no files. Pick the folder that contains the driver's .inf files.")
+                if (folder.files.size > dev.ruchin.anvil.writer.DriverFolder.MAX_FILES) {
+                    throw AnvilException("That folder has too many files. Pick just the storage driver's folder.")
+                }
+                DebugLog.i(TAG, "drivers folder '${folder.name}': ${folder.files.size} files, ${folder.totalBytes} B")
+                _ui.update { it.copy(readingDrivers = false, driversFolder = folder, addDrivers = true) }
+            } catch (e: AnvilException) {
+                _ui.update { it.copy(readingDrivers = false, driversError = e.userMessage) }
+            } catch (e: Exception) {
+                DebugLog.e(TAG, "drivers folder read failed", e)
+                _ui.update { it.copy(readingDrivers = false, driversError = "Couldn't read that folder: ${e.message}") }
+            }
+        }
+    }
+
     fun setScheme(s: PartitionScheme) = _ui.update { it.copy(scheme = s) }
 
     fun updateCustomize(f: (CustomizeUi) -> CustomizeUi) = _ui.update { it.copy(customize = f(it.customize)) }
@@ -191,7 +224,10 @@ class WriteViewModel @Inject constructor(
         val image = s.image ?: return
         val drive = s.opened ?: return
         _ui.update { it.copy(showConfirm = false) }
-        if (s.isWindows) jobs.startWindowsWrite(image.source, image.info.volumeLabel, drive, s.scheme, s.customize.toOptions())
+        if (s.isWindows) {
+            val drivers = s.driversFolder?.takeIf { s.addDrivers }?.toDriverFolder(context)
+            jobs.startWindowsWrite(image.source, image.info.volumeLabel, drive, s.scheme, s.customize.toOptions(), drivers = drivers)
+        }
         else jobs.startWrite(image.source, drive)
         // The job now owns the device handle; forget it here so we don't close it.
         _ui.update { it.copy(opened = null) }

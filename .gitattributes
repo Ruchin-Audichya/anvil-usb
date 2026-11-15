@@ -1,0 +1,5 @@
+# Signed distro files and pinned keys must stay byte-exact: line-ending conversion breaks signatures.
+core/catalog/src/test/resources/linux/** -text
+core/catalog/src/main/resources/**/*.asc -text
+*.png binary
+*.wim binary

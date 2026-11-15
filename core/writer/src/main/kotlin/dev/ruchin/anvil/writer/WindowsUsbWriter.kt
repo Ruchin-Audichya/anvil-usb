@@ -40,6 +40,8 @@ data class WindowsWriteOptions(
     val label: String? = null,
     /** Windows Setup automation (bypass, local account, …); null = plain, unmodified installer. */
     val unattend: dev.ruchin.anvil.unattend.UnattendOptions? = null,
+    /** Optional driver folder copied to \Drivers\ (Intel RST/VMD storage drivers for "No drivers were found"). */
+    val drivers: DriverFolder? = null,
 )
 
 data class WindowsWriteResult(
@@ -108,6 +110,10 @@ class WindowsUsbWriter(
         }
         add(root, tree)
         options.unattend?.let { customize(tree, root, it, isoLabel) }
+        options.drivers?.let {
+            it.addTo(tree)
+            DebugLog.i(TAG, "drivers: ${it.files.size} files, ${it.totalBytes} B from '${it.displayName}' → \\${DriverFolder.TARGET}")
+        }
         if (!hasEfiBoot) {
             throw AnvilException(
                 "This doesn't look like a Windows installer ISO (no UEFI boot files found).",

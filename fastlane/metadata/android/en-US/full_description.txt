@@ -6,10 +6,12 @@ Plug a USB drive into your phone (OTG adapter or USB-C drive), pick an image, an
 <ul>
 <li>Windows 10 &amp; 11 installers: download the ISO straight from Microsoft's official servers inside the app, or pick one you already have</li>
 <li>Handles the 7+ GB install.wim: automatically split for FAT32 so the drive boots on UEFI with Secure Boot on</li>
-<li>Linux: write Ubuntu, Fedora, Mint, Debian and other hybrid ISOs directly</li>
+<li>Linux: download Ubuntu, Linux Mint, Fedora or Debian from the official mirrors inside the app. Anvil checks the distro's signature on the checksum list and the ISO's SHA-256 before writing, and picks the fastest mirror</li>
+<li>Or write any other hybrid Linux ISO you already have</li>
 <li>Verifies every write with a SHA-256 read-back</li>
+<li>Windows "No drivers were found" fix: copy your laptop's Intel RST/VMD storage driver to the USB drive</li>
 <li>Optional Windows Setup helpers: local account, skip privacy screens, keep BitLocker off, and an optional switch to skip the Windows 11 hardware check (TPM/Secure Boot/CPU) for older PCs</li>
-<li>Runs in the background with progress notifications</li>
+<li>Runs in the background with progress notifications; compatibility mode for fussy phones and USB hubs</li>
 </ul>
 
 <b>Why it works without root</b>

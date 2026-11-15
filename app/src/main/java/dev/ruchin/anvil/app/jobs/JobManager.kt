@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat
 import dev.ruchin.anvil.app.R
 import dev.ruchin.anvil.app.source.ContentUriImageSource
 import dev.ruchin.anvil.app.usb.OpenedDrive
+import dev.ruchin.anvil.catalog.linux.ResolvedLinuxIso
 import dev.ruchin.anvil.catalog.windows.MicrosoftIsoResolver
 import dev.ruchin.anvil.catalog.windows.WindowsDownloadLink
 import dev.ruchin.anvil.common.AnvilException
@@ -21,6 +22,7 @@ import dev.ruchin.anvil.writer.WindowsProgress
 import dev.ruchin.anvil.writer.WindowsStage
 import dev.ruchin.anvil.writer.WindowsUsbWriter
 import dev.ruchin.anvil.writer.WindowsWriteOptions
+import dev.ruchin.anvil.writer.DriverFolder
 import dev.ruchin.anvil.fat.PartitionScheme
 import dev.ruchin.anvil.writer.WriteProgress
 import dev.ruchin.anvil.writer.WriteStage
@@ -60,6 +62,13 @@ data class JobState(
     val outputPath: String? = null,
     /** File currently being copied (Windows writes). */
     val currentFile: String? = null,
+    /** Shown as a green badge on success, e.g. "Signature + checksum verified" for Linux downloads. */
+    val verifiedNote: String? = null,
+    /** Linux catalog download (vs. Windows): decides which screen the home card opens. */
+    val linux: Boolean = false,
+    /** A Windows installer write; the done screen shows the "No drivers were found" help. */
+    val windowsWrite: Boolean = false,
+    val driversIncluded: Boolean = false,
 ) {
     val fraction: Float get() = if (bytesTotal <= 0) 0f else (bytesDone.toDouble() / bytesTotal).toFloat().coerceIn(0f, 1f)
     val isActive get() = status == JobStatus.RUNNING
@@ -114,6 +123,7 @@ class JobManager @Inject constructor(
     fun startWindowsWrite(
         source: ContentUriImageSource, isoLabel: String?, drive: OpenedDrive, scheme: PartitionScheme,
         unattend: dev.ruchin.anvil.unattend.UnattendOptions? = null, verify: Boolean = true,
+        drivers: Pair<DriverFolder, java.io.Closeable>? = null,
     ) {
         check(!isBusy) { "a job is already running" }
         _state.value = JobState(
@@ -121,11 +131,14 @@ class JobManager @Inject constructor(
             title = "${source.displayName} → ${drive.displayName} (${ByteSize.marketingCapacity(drive.sizeBytes)})",
             stages = WINDOWS_STAGES,
             bytesTotal = source.sizeBytes,
+            windowsWrite = true,
+            driversIncluded = drivers != null,
         )
         launch(JobKind.WRITE_USB) {
             try {
+                val options = WindowsWriteOptions(scheme = scheme, verify = verify, unattend = unattend, drivers = drivers?.first)
                 val result = source.openRandomAccess().use { iso ->
-                    windowsWriter.write(iso, isoLabel, drive.blockDevice, WindowsWriteOptions(scheme = scheme, verify = verify, unattend = unattend)) { p -> onWindowsProgress(p) }
+                    windowsWriter.write(iso, isoLabel, drive.blockDevice, options) { p -> onWindowsProgress(p) }
                 }
                 drive.blockDevice.eject()
                 _state.update {
@@ -136,6 +149,7 @@ class JobManager @Inject constructor(
                             append("${result.filesWritten} files · ${scheme.name} + FAT32 (UEFI)")
                             if (result.swmParts.isNotEmpty()) append(" · install.wim split into ${result.swmParts.size} parts")
                             if (unattend != null) append(" · Setup customised")
+                            drivers?.let { append(" · ${it.first.files.size} driver files in \\Drivers") }
                             if (result.verified) append(" · verified")
                             append(" · ${result.durationMs / 1000}s")
                         },
@@ -143,6 +157,48 @@ class JobManager @Inject constructor(
                 }
             } finally {
                 runCatching { drive.blockDevice.close() }
+                drivers?.let { runCatching { it.second.close() } }
+            }
+        }
+    }
+
+    /**
+     * Linux catalog download. [iso] was resolved from a checksum list whose signature already
+     * checked out; the downloader now verifies the ISO against that signed SHA-256. Only a file that
+     * passes both ends up at [destination]; anything else is deleted and the job fails, so the
+     * "Write to USB" step never sees an unverified ISO.
+     */
+    fun startLinuxDownload(iso: ResolvedLinuxIso, destination: File) {
+        check(!isBusy) { "a job is already running" }
+        _state.value = JobState(
+            kind = JobKind.DOWNLOAD,
+            title = iso.title,
+            stages = LINUX_DOWNLOAD_STAGES,
+            stageIndex = 1,
+            bytesTotal = iso.sizeBytes ?: 0,
+            linux = true,
+        )
+        launch(JobKind.DOWNLOAD) {
+            var mirror = 0
+            val req = DownloadRequest(
+                urlProvider = { refresh ->
+                    if (refresh) mirror = (mirror + 1) % iso.mirrorUrls.size
+                    iso.mirrorUrls[mirror].also { DebugLog.i(TAG, "mirror ${mirror + 1}/${iso.mirrorUrls.size}: $it") }
+                },
+                destination = destination,
+                expectedSha256 = iso.sha256,
+                expectedSize = iso.sizeBytes,
+                switchUrlAfterFailures = 3,
+            )
+            val file = downloader.download(req) { p -> onDownloadProgress(p, stageOffset = 1) }
+            _state.update {
+                it?.copy(
+                    status = JobStatus.SUCCEEDED, stageIndex = LINUX_DOWNLOAD_STAGES.lastIndex, stageNote = null,
+                    bytesDone = file.length(), bytesTotal = file.length(),
+                    outputPath = file.absolutePath,
+                    verifiedNote = context.getString(R.string.verified_badge),
+                    resultDetail = "${iso.signer.owner} · SHA-256 ${iso.sha256.take(16)}…",
+                )
             }
         }
     }
@@ -250,7 +306,7 @@ class JobManager @Inject constructor(
         }
     }
 
-    private fun onDownloadProgress(p: DownloadProgress) {
+    private fun onDownloadProgress(p: DownloadProgress, stageOffset: Int = 0) {
         val (idx, note) = when (p.stage) {
             DownloadStage.CONNECTING -> 0 to null
             DownloadStage.DOWNLOADING -> 1 to null
@@ -260,7 +316,7 @@ class JobManager @Inject constructor(
         }
         _state.update {
             it?.copy(
-                stageIndex = idx, stageNote = note, bytesDone = p.bytesDone,
+                stageIndex = idx + stageOffset, stageNote = note, bytesDone = p.bytesDone,
                 bytesTotal = if (p.bytesTotal > 0) p.bytesTotal else it.bytesTotal,
                 bytesPerSecond = p.bytesPerSecond, etaSeconds = p.etaSeconds,
             )
@@ -280,5 +336,6 @@ class JobManager @Inject constructor(
         val DOWNLOAD_STAGES = listOf(
             R.string.stage_connecting, R.string.stage_downloading, R.string.stage_checksum, R.string.stage_done,
         )
+        val LINUX_DOWNLOAD_STAGES = listOf(R.string.stage_signature) + DOWNLOAD_STAGES
     }
 }
