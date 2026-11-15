@@ -10,7 +10,9 @@ import android.hardware.usb.UsbManager
 import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
+import dev.ruchin.anvil.app.settings.AppSettings
 import dev.ruchin.anvil.blockdev.ScsiBlockDevice
+import dev.ruchin.anvil.blockdev.UsbTuning
 import dev.ruchin.anvil.common.DebugLog
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CompletableDeferred
@@ -41,6 +43,7 @@ class OpenedDrive(val drive: UsbDrive, val blockDevice: ScsiBlockDevice) {
 @Singleton
 class UsbDriveRepository @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val settings: AppSettings,
 ) {
     private val manager = context.getSystemService(UsbManager::class.java)
     private val _drives = MutableStateFlow<List<UsbDrive>>(emptyList())
@@ -108,9 +111,10 @@ class UsbDriveRepository @Inject constructor(
 
     /** Opens the drive and probes it over SCSI (INQUIRY / READ CAPACITY). Call after permission is granted. */
     suspend fun open(drive: UsbDrive): OpenedDrive = withContext(Dispatchers.IO) {
-        val transport = AndroidUsbTransport.open(manager!!, drive.device)
+        val tuning = UsbTuning.forAndroid(Build.VERSION.SDK_INT, settings.compatibilityMode.value)
+        val transport = AndroidUsbTransport.open(manager!!, drive.device, tuning)
         try {
-            OpenedDrive(drive, ScsiBlockDevice.open(transport))
+            OpenedDrive(drive, ScsiBlockDevice.open(transport, tuning.maxCommandBytes))
         } catch (t: Throwable) {
             transport.close()
             throw t
