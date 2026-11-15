@@ -40,6 +40,12 @@ data class DownloadRequest(
     val expectedSha256: String? = null,
     val expectedSize: Long? = null,
     val userAgent: String = DEFAULT_UA,
+    /**
+     * Mirror fallback: after this many consecutive network/HTTP failures on one URL, ask
+     * [urlProvider] (refresh = true) for another one. Null (the default, used for Windows) keeps
+     * retrying the same URL.
+     */
+    val switchUrlAfterFailures: Int? = null,
 ) {
     companion object {
         const val DEFAULT_UA = "Mozilla/5.0 (Linux; Android 15) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0 Mobile Safari/537.36"
@@ -162,6 +168,11 @@ class ResumableDownloader(
                             "Download keeps failing — check your internet connection. Progress is saved; tap Resume to continue.",
                             technical = "giving up after $failures failures: ${e.message}", cause = e,
                         )
+                    }
+                    val switchAfter = req.switchUrlAfterFailures
+                    if (switchAfter != null && failures % switchAfter == 0) {
+                        DebugLog.w(TAG, "$failures failures on this server: switching mirror")
+                        url = req.urlProvider(true)
                     }
                     val backoff = (baseBackoffMs shl (failures - 1).coerceAtMost(5)).coerceAtMost(60_000)
                     DebugLog.w(TAG, "network error (#$failures), retrying in ${backoff}ms", e)

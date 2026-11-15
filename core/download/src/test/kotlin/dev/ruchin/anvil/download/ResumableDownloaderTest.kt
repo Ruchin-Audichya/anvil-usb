@@ -107,6 +107,43 @@ class ResumableDownloaderTest {
         assertThat(File(dest.path + ".part").exists()).isFalse()
     }
 
+    @Test fun `switches to the next mirror when one keeps failing`() = runBlocking {
+        val broken = MockWebServer().apply {
+            dispatcher = object : Dispatcher() { override fun dispatch(request: RecordedRequest) = MockResponse(code = 503) }
+            start()
+        }
+        try {
+            val urls = listOf(broken.url("/a.iso").toString(), server.url("/a.iso").toString())
+            var i = 0
+            val dest = File(tmp, "m.iso")
+            downloader.download(
+                DownloadRequest({ refresh -> if (refresh) i = (i + 1) % urls.size; urls[i] }, dest, payloadSha, switchUrlAfterFailures = 2),
+            )
+            assertThat(dest.readBytes()).isEqualTo(payload)
+            assertThat(broken.requestCount).isEqualTo(2)
+        } finally {
+            broken.close()
+        }
+    }
+
+    @Test fun `without mirror fallback a failing server is retried, not switched`() {
+        val broken = MockWebServer().apply {
+            dispatcher = object : Dispatcher() { override fun dispatch(request: RecordedRequest) = MockResponse(code = 503) }
+            start()
+        }
+        try {
+            var refreshes = 0
+            assertThrows<dev.ruchin.anvil.common.AnvilException> {
+                runBlocking {
+                    downloader.download(DownloadRequest({ refresh -> if (refresh) refreshes++; broken.url("/a.iso").toString() }, File(tmp, "n.iso"), payloadSha))
+                }
+            }
+            assertThat(refreshes).isEqualTo(0)
+        } finally {
+            broken.close()
+        }
+    }
+
     @Test fun `content-range parsing`() {
         assertThat(ResumableDownloader.parseContentRangeTotal("bytes 0-1023/9047330816")).isEqualTo(9047330816L)
         assertThat(ResumableDownloader.parseContentRangeTotal(null)).isNull()
