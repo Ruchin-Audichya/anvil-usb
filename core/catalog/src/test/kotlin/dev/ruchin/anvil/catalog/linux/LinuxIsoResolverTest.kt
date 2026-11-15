@@ -66,7 +66,7 @@ class LinuxIsoResolverTest {
         checksumUrl = "26.04/SHA256SUMS", signatureUrl = "26.04/SHA256SUMS.gpg", keyId = "ubuntu-cdimage",
     )
 
-    private val resolver = LinuxIsoResolver(OkHttpClient(), prober = MirrorProber(OkHttpClient(), probeBytes = 64 * 1024, timeoutMs = 3_000))
+    private val resolver = LinuxIsoResolver(OkHttpClient(), prober = MirrorProber(OkHttpClient(), probeBytes = 64 * 1024, headerTimeoutMs = 3_000))
 
     @Test fun `resolves the newest signed ISO and ranks the faster mirror first`() = runBlocking {
         ma.slowMs = 600
@@ -117,6 +117,15 @@ class LinuxIsoResolverTest {
         val r = resolver.resolve(fedora)
         assertThat(r.fileName).isEqualTo("Fedora-Workstation-Live-45-1.4.x86_64.iso")
         assertThat(r.sha256).isEqualTo("68338c6bfe4f0d64151f2e47efe9f44a8855ad05b460e56b844fb3fa2c9a3beb")
+    }
+
+    @Test fun `a slow but working mirror is kept, just ranked lower`(): Unit = runBlocking {
+        ma.slowMs = 1_200
+        val prober = MirrorProber(OkHttpClient(), probeBytes = 64 * 1024, headerTimeoutMs = 3_000, bodyBudgetMs = 300)
+        val urls = listOf(root(a), root(b)).map { it + "/26.04/ubuntu-26.04.1-desktop-amd64.iso" }
+        val ranked = prober.rank(urls)
+        assertThat(ranked.map { it.url }).containsExactly(urls[1], urls[0]).inOrder()
+        assertThat(ranked.all { it.ok }).isTrue()
     }
 
     @Test fun `unpinned key is refused`() {
