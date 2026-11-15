@@ -3,9 +3,9 @@
 **Download:** [ruchinaudichya.in/anvil](https://ruchinaudichya.in/anvil), or `Anvil.apk` below.
 Installs over 0.4.0 as a normal update.
 
-> **Pre-release.** Built and unit-tested, and the Linux catalog was checked against the real distro mirrors,
-> but the on-device test pass ([REAL-DEVICE-TEST.md](https://github.com/Ruchin-Audichya/anvil-usb/blob/main/REAL-DEVICE-TEST.md))
-> hasn't been done yet. Reports from your phone and USB drive are very welcome.
+Tested on real phones and USB drives against the
+[real-device checklist](https://github.com/Ruchin-Audichya/anvil-usb/blob/main/REAL-DEVICE-TEST.md).
+Reports from your phone and USB drive are still very welcome.
 
 ### What's new
 

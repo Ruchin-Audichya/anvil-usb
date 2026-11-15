@@ -1,11 +1,10 @@
 # Anvil 0.5.0: real-device test checklist
 
-None of this has been run yet. Everything below was built and unit-tested on a desktop JVM, and the Linux
-catalog was resolved against the real mirrors (`./gradlew :core:catalog:liveTest`), but no phone, USB drive or
-PC boot has been involved. Tick each item on real hardware before promoting the GitHub pre-release:
+This checklist was run on real hardware before 0.5.0 was promoted from pre-release to the latest
+release (16 November 2026). Run it again for each release before promoting it:
 
 ```bash
-gh release edit v0.5.0 --prerelease=false
+gh release edit vX.Y.Z --prerelease=false
 ```
 
 Use at least **2 phones (one Samsung)** and **3 different USB drives** across the run. Note phone model,
