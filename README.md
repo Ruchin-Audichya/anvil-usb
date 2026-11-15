@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/anvil-icon.svg" width="112" alt="Anvil logo">
+  <img src="docs/brand/anvil-icon.svg" width="112" alt="Anvil logo">
 </p>
 
 <h1 align="center">Anvil</h1>
@@ -18,18 +18,20 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Ruchin-Audichya/anvil-usb/releases/latest/download/Anvil.apk"><b>⬇️ Download the APK</b></a>
+  <a href="https://ruchinaudichya.in/anvil"><b>⬇️ Download Anvil</b></a> · ruchinaudichya.in/anvil<br>
+  <sub>or grab <a href="https://github.com/Ruchin-Audichya/anvil-usb/releases/latest/download/Anvil.apk">Anvil.apk</a> straight from the latest release</sub>
 </p>
 
 ---
 
 Your laptop won't boot. The only computer you have left is in your pocket.
 
-Plug a pendrive into your phone with an OTG adapter, open **Anvil**, pick Windows 11 — Anvil fetches the
-official ISO straight from Microsoft, writes a bootable installer, and gets out of your way.
+Plug a pendrive into your phone with an OTG adapter, open **Anvil**, pick Windows 11 or a Linux distro: Anvil
+fetches the official ISO (from Microsoft, or from the distro's own mirrors), verifies it, writes a bootable
+installer, and gets out of your way.
 
-> **Status: beta.** The writing engine is verified end-to-end (details below). Real-device testing across
-> phones and USB drives is ongoing — reports are very welcome.
+> **Status: beta (0.5.0).** The writing engine is verified end-to-end (details below). Real-device testing across
+> phones and USB drives is ongoing; reports are very welcome.
 
 <p align="center">
   <img src="marketing/slides/slide-1.png" width="24%" alt="Your laptop just died. Your phone can fix it.">
@@ -41,19 +43,29 @@ official ISO straight from Microsoft, writes a bootable installer, and gets out 
 
 ## Why Anvil
 
-| | Anvil | EtchDroid | DriveDroid |
-|---|:---:|:---:|:---:|
-| Linux ISOs | ✅ | ✅ | ✅ |
-| **Windows 10/11 ISOs** | ✅ | ❌ | ⚠️ |
-| Works **without root** | ✅ | ✅ | ❌ |
-| Downloads the official ISO for you | ✅ | ❌ | ❌ |
-| Windows 11 requirement bypass, local account | ✅ | ❌ | ❌ |
+| | Anvil | EtchDroid | DriveDroid | Ventoy |
+|---|:---:|:---:|:---:|:---:|
+| Works from just a phone | ✅ | ✅ | ✅ | ❌ needs a PC |
+| Linux ISOs | ✅ | ✅ | ✅ | ✅ |
+| **Windows 10/11 ISOs** | ✅ | ❌ | ⚠️ | ✅ |
+| Works **without root** | ✅ | ✅ | ❌ | n/a |
+| Downloads the official ISO for you (Windows **and** Linux) | ✅ | ❌ | ⚠️ | ❌ |
+| Verifies the distro's GPG signature before writing | ✅ | ❌ | ❓ | n/a |
+| Windows 11 requirement bypass, local account | ✅ | ❌ | ❌ | ⚠️ plugin |
+| Storage drivers folder for "No drivers were found" | ✅ | ❌ | ❌ | ⚠️ injection plugin |
 
 ## Features
 
 **Get the OS**
 - 🪟 **Latest Windows 11 / 10 (x64 & Arm64) from Microsoft's own servers** — the same session-based API the
   official download page uses. Pick a language; Anvil gets a fresh signed link. Nothing is mirrored or re-hosted.
+- 🐧 **Linux catalog (new in 0.5.0)**: Ubuntu (LTS + latest), Linux Mint, Fedora Workstation and Debian
+  (netinst + live). Anvil fetches the distro's checksum list, verifies its **GPG signature with the distro key
+  pinned in the app**, then checks the ISO's SHA-256. You see a green *Signature + checksum verified* before
+  you can write, and a file that fails either check is never written.
+- ⚡ **Fastest mirror** — every mirror gets a quick test download; Anvil uses the fastest and switches
+  automatically if it fails mid-download. The catalog updates from this repo, so new point releases appear
+  without an app update.
 - 🔐 **Verified downloads** — every Windows ISO is checked against the SHA-256 Microsoft publishes.
 - 📶 **Resumable** — survives network drops (HTTP Range + ETag), app restarts and expired 24-hour links.
   Warns before using mobile data and checks free space first.
@@ -67,6 +79,8 @@ official ISO straight from Microsoft, writes a bootable installer, and gets out 
 - ✔️ **Read-back verification** of everything written — catches failing and fake-capacity drives.
 - 🧠 Detects what you picked by looking *inside* the ISO, so renamed or custom ISOs are handled correctly.
 - 🔌 Unplug-safe: clear recovery instructions if the drive disconnects mid-write.
+- 🧩 **Drivers folder (new)**: copy your laptop's Intel RST/VMD storage driver to `\Drivers` on the Windows
+  drive, plus on-screen help for Setup's *"No drivers were found"*.
 
 **Customize Windows Setup** (optional, all toggles)
 - Skip Windows 11's **TPM 2.0 / Secure Boot / RAM / CPU** checks
@@ -79,7 +93,8 @@ official ISO straight from Microsoft, writes a bootable installer, and gets out 
 **Built for real phones**
 - Runs as a foreground service with a progress notification — switch apps or turn the screen off.
 - Progress with speed, ETA and a stage checklist. Battery warning below 30 %.
-- English and हिन्दी. Material 3, light and dark themes.
+- **Compatibility mode** (Settings): 16 KiB USB transfers for phones, OTG hubs and drives that disconnect mid-write.
+- English and हिन्दी. Material 3, light and dark themes, Android 13+ themed icon.
 
 ## How it works
 
@@ -90,6 +105,7 @@ whole drive is writable without root.
 ```mermaid
 flowchart LR
     MS[Microsoft download API] -->|signed link + SHA-256| DL[Resumable downloader]
+    LX[Distro mirrors] -->|GPG-signed SHA256SUMS, fastest mirror| DL
     DL --> ISO[(ISO on phone)]
     ISO --> UDF[UDF reader]
     UDF --> WIM[install.wim → .swm splitter]
@@ -112,7 +128,7 @@ Everything below the UI is plain Kotlin, unit-tested on a desktop JVM against a 
 | `core:fat` | GPT/MBR partitioner and a single-pass FAT32 writer (contiguous files, generated FAT) |
 | `core:unattend` | `autounattend.xml` generator for the Windows Setup options |
 | `core:download` | Resumable downloader with SHA-256 verification |
-| `core:catalog` | Microsoft ISO link resolver |
+| `core:catalog` | Microsoft ISO link resolver; Linux catalog (manifest, pinned distro keys, GPG via Bouncy Castle, mirror probing) |
 | `app` | Jetpack Compose UI, Hilt, foreground service, Android USB transport |
 | `tools:devcli` | Desktop CLI that runs the same engine against image files |
 
@@ -135,13 +151,16 @@ Using a real Windows 11 ISO (build 26300, 8.4 GB) downloaded through Anvil's own
 
 ## Get started
 
-1. [**Download the APK**](https://github.com/Ruchin-Audichya/anvil-usb/releases/latest/download/Anvil.apk) (or browse [Releases](https://github.com/Ruchin-Audichya/anvil-usb/releases)) and install it — allow "Install unknown apps" when Android asks.
+1. Open [**ruchinaudichya.in/anvil**](https://ruchinaudichya.in/anvil) on your phone and tap **Download APK**
+   (or get [Anvil.apk](https://github.com/Ruchin-Audichya/anvil-usb/releases/latest/download/Anvil.apk) from
+   [Releases](https://github.com/Ruchin-Audichya/anvil-usb/releases)), then install it: allow "Install unknown apps" when Android asks.
 2. Plug a USB drive (16 GB+ for Windows, 8 GB+ for Linux) into your phone with an OTG adapter.
-3. **Download Windows** → choose version & language → **Download** → **Write this ISO to a USB drive**.
-   Or **Write an ISO** and pick a file you already have.
+3. **Download Linux** → pick a distro and edition → **Check signature & find fastest mirror** → **Download** →
+   **Write this ISO to a USB drive**. Or **Download Windows** → choose version & language → **Download** → **Write**.
+   Or **Write an ISO you already have**.
 4. Boot your PC from the USB drive (boot menu key: HP F9, Dell F12, Lenovo F12, ASUS Esc/F8, Acer F12).
 
-**Updating from v0.3.x?** v0.4.0 is signed with a new release key, so uninstall the old version once before installing it. Future updates install over the top as normal.
+**Updating?** 0.5.0 installs over 0.4.0 as normal. Coming from v0.3.x, uninstall the old version once first (0.4.0 introduced a new release key).
 
 **If installing is blocked:** Anvil isn't on the Play Store yet, so Android double-checks it.
 - Chrome says *"File might be harmful"* → tap **Download anyway**.
@@ -176,10 +195,11 @@ tools/devcli/build/install/anvil-dev/bin/anvil-dev write-windows ~/isos/Win11.is
 - [x] Windows writer: GPT + FAT32 + `install.wim` split, UEFI + Secure Boot
 - [x] Official Windows downloads with resume and SHA-256 verification
 - [x] Windows 11 requirement bypass, local account, privacy and debloat options
-- [ ] Linux catalog (Ubuntu & flavours, Mint, Fedora, Debian) with fastest-mirror selection and GPG-verified checksums
+- [x] Linux catalog (Ubuntu, Mint, Fedora, Debian) with fastest-mirror selection and GPG-verified checksums (0.5.0)
+- [x] Drivers folder for Windows Setup's "No drivers were found", compatibility mode (0.5.0)
 - [ ] Stream-to-USB: write while downloading, for phones with little free storage
 - [ ] NTFS layout with UEFI:NTFS for ISOs with very large files; legacy BIOS boot
-- [ ] Driver injection (Intel RST/VMD storage, Wi-Fi) per laptop model
+- [ ] Automatic driver injection (Intel RST/VMD storage, Wi-Fi) per laptop model
 - [ ] Rescue toolkit: multi-boot drive, data-rescue live USB, offline troubleshooting guides
 - [ ] Guided install companion: per-brand boot keys and step-by-step screens
 

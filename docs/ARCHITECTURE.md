@@ -14,7 +14,8 @@ anvil/
 ├── core/image       (JVM)    ImageInspector: hybrid ISO vs Windows UDF ISO vs disk image
 ├── core/writer      (JVM)    RawImageWriter (dd-style, pipelined, read-back verify)
 ├── core/download    (JVM)    ResumableDownloader (Range/If-Range, retries, signed-URL refresh, SHA-256)
-├── core/catalog     (JVM)    MicrosoftIsoResolver (official Windows links + hashes)
+├── core/catalog     (JVM)    MicrosoftIsoResolver (official Windows links + hashes); Linux catalog:
+│                             manifest, pinned distro keys, OpenPGP checks (Bouncy Castle), mirror probing
 ├── core/udf         (JVM)    read-only UDF reader (Windows ISOs keep their real file tree in UDF)
 ├── core/wim         (JVM)    WimSplitter: install.wim → .swm parts, compressed resources copied verbatim
 ├── core/fat         (JVM)    GPT/MBR partitioner + single-pass FAT32 writer (contiguous runs, generated FAT)
@@ -30,7 +31,7 @@ Planned additions, by milestone:
 | Milestone | New modules |
 |---|---|
 | 2 Windows writer | done: `core:udf`, `core:wim`, `core:fat` (pure Kotlin, no NDK needed) |
-| 3–4 Catalog | `core:catalog` gains the remote JSON manifest + Linux mirrors + GPG (`SHA256SUMS.gpg`, Bouncy Castle) |
+| 3–4 Catalog | done (0.5.0): `core:catalog` Linux manifest + mirrors + pinned-key GPG verification (Bouncy Castle) |
 | 5 Stream to USB | `core:writer` gets an HTTP `ImageSource` with a ring buffer and backpressure |
 | 6 Customisation | done: `core:unattend` + Customize card in the write screen |
 | 7 Rescue | `feature:rescue`, `feature:guide`, offline content as bundled assets |
@@ -61,8 +62,9 @@ don't implement SYNCHRONIZE CACHE or MODE SENSE; descriptor-format sense data; d
 (16-byte CDBs). Fake-capacity drives get caught by the read-back SHA-256 verification.
 `FakeUsbStick` (test) implements the device side of the protocol, so the exact bytes are tested.
 
-Remaining risk: some OEM kernels and cheap hubs. Mitigation: a "compatibility mode" setting with smaller
-transfers (16 KiB) and an async `UsbRequest` queue for throughput, both toggled by the transport.
+Remaining risk: some OEM kernels and cheap hubs. Mitigation: the "Compatibility mode" setting (0.5.0, `UsbTuning`)
+uses 16 KiB bulk transfers and 64 KiB SCSI commands instead of 128 KiB / 1 MiB. An async `UsbRequest` queue for
+throughput is still to do.
 
 ### 2. WIM splitting (milestone 2) — DONE, without the NDK
 Implemented in pure Kotlin (`core:wim`) instead of binding wimlib: a split never decompresses, it only
@@ -107,3 +109,26 @@ human-readable explanation; the downloader refreshes expired URLs mid-download; 
 (foreground; `connectedDevice` type for writes, `dataSync` for downloads) holds a partial wake lock and
 mirrors `JobState` to a notification with Cancel. The UI only observes `StateFlow`s. WorkManager will
 take over download scheduling when auto-resume-on-Wi-Fi lands (milestone 3).
+
+## Linux catalog (0.5.0)
+
+```
+linux-manifest.json (remote from the repo, else bundled in assets)
+   └─ entry: mirrors[], isoPath "26.04/ubuntu-{version}-desktop-amd64.iso", checksumUrl, signatureUrl?, keyId
+        1. fetch SHA256SUMS (+ .gpg / .sign) from the first mirror that serves it
+        2. verify with the key pinned in the app for keyId  ── fail → stop, nothing downloaded or written
+        3. pick the newest {version} match from the *signed* text → file name + SHA-256
+        4. ranged GET (128 KiB) on every mirror in parallel → 206-capable mirrors, fastest first
+        5. ResumableDownloader: Range/If-Range resume, switches mirror after 3 failures, verifies SHA-256
+```
+
+- **Trust lives in the app, not the manifest.** The manifest can only name a `keyId`; the key files ship in
+  `core/catalog/src/main/resources/.../keys/` and must match fingerprints hard-coded in `PinnedKeys`
+  (checked against each distro's own verification page). Remote entries naming unknown keys or plain-http
+  mirrors are dropped. A new Fedora release key needs an app update; Fedora 44–46 are pinned.
+- **Clear-signed files** (Fedora's `CHECKSUM`) are parsed only from the text the signature covers.
+- **`{version}`** matches digits, dots and dashes, so `ubuntu-{version}-desktop-amd64.iso` picks `26.04.1`
+  over `26.04` and skips `26.10-beta`; Debian's `current/` paths keep working across point releases.
+- Tests use the real published checksum files and signatures as fixtures (kept byte-exact by
+  `.gitattributes`). `./gradlew :core:catalog:liveTest` resolves every bundled entry against the real
+  mirrors and prints a `MIRROR FAILURES` block for pruning.

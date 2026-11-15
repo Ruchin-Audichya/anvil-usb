@@ -1,0 +1,5 @@
+• Download Linux: Ubuntu (LTS + latest), Linux Mint, Fedora and Debian from official mirrors, with the distro's signature and the ISO's SHA-256 verified before anything is written
+• Fastest-mirror selection with automatic fallback
+• Windows: optional drivers folder copied to \Drivers, plus help for "No drivers were found" (Intel RST/VMD)
+• Compatibility mode for fussy phones, hubs and USB drives
+• New app icon with Android 13+ themed icon
