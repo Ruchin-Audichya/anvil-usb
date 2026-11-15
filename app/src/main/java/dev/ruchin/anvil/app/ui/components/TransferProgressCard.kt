@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -110,6 +111,13 @@ fun TransferProgressCard(
                     Text(stringResource(R.string.action_cancel))
                 }
                 JobStatus.SUCCEEDED -> {
+                    state.verifiedNote?.let { note ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Filled.Verified, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text(note, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
+                        }
+                    }
                     Text(
                         stringResource(if (state.kind == JobKind.WRITE_USB) R.string.write_success else R.string.download_success),
                         style = MaterialTheme.typography.bodyLarge,

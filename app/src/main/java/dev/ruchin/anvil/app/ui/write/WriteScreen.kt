@@ -64,6 +64,8 @@ fun WriteScreen(onBack: () -> Unit, vm: WriteViewModel = hiltViewModel()) {
     val drives by vm.availableDrives.collectAsStateWithLifecycle()
     val job by vm.jobs.state.collectAsStateWithLifecycle()
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> uri?.let(vm::onImagePicked) }
+    val folderPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri -> uri?.let(vm::onDriversPicked) }
+    val compat by vm.settings.compatibilityMode.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -80,6 +82,9 @@ fun WriteScreen(onBack: () -> Unit, vm: WriteViewModel = hiltViewModel()) {
             val current = job
             if (current != null && current.kind == JobKind.WRITE_USB) {
                 TransferProgressCard(current, onCancel = vm.jobs::cancel, onDismiss = vm.jobs::dismiss)
+                if (current.status == dev.ruchin.anvil.app.jobs.JobStatus.SUCCEEDED && current.windowsWrite) {
+                    DriversHelpCard(current.driversIncluded)
+                }
                 if (current.isActive) {
                     Notice(Icons.Filled.Warning, stringResource(R.string.write_keep_plugged), MaterialTheme.colorScheme.error)
                     return@Column
@@ -146,9 +151,11 @@ fun WriteScreen(onBack: () -> Unit, vm: WriteViewModel = hiltViewModel()) {
                     Text(stringResource(R.string.opening_drive))
                 }
                 ui.driveError?.let { Notice(Icons.Filled.Warning, it, MaterialTheme.colorScheme.error) }
+                if (compat) Notice(Icons.Filled.Info, stringResource(R.string.compat_on_notice))
             }
 
             if (ui.isWindows) CustomizeCard(ui.customize, vm::updateCustomize)
+            if (ui.isWindows) DriversCard(ui, vm::setAddDrivers) { folderPicker.launch(null) }
 
             ui.battery?.takeIf { it.low }?.let {
                 Notice(Icons.Filled.BatteryAlert, stringResource(R.string.battery_low, it.percent), MaterialTheme.colorScheme.error)
@@ -201,6 +208,54 @@ private fun CustomizeCard(c: CustomizeUi, update: ((CustomizeUi) -> CustomizeUi)
             if (r != null) listOfNotNull(r.timeZone, r.userLocale, stringResource(R.string.cust_keyboard, r.inputLocale)).joinToString(" · ") else "",
             c.useRegion,
         ) { v -> update { it.copy(useRegion = v) } }
+    }
+}
+
+@Composable
+private fun DriversCard(ui: WriteUiState, setEnabled: (Boolean) -> Unit, pick: () -> Unit) {
+    SectionCard(stringResource(R.string.drivers_title)) {
+        ToggleRow(stringResource(R.string.drivers_title), stringResource(R.string.drivers_desc), ui.addDrivers, setEnabled)
+        if (!ui.addDrivers) return@SectionCard
+        val folder = ui.driversFolder
+        if (folder != null) {
+            Notice(
+                Icons.Filled.CheckCircle,
+                stringResource(R.string.drivers_summary, folder.name, folder.files.size, ByteSize.format(folder.totalBytes)),
+                MaterialTheme.colorScheme.primary,
+            )
+        } else if (!ui.readingDrivers) {
+            Notice(Icons.Filled.Info, stringResource(R.string.drivers_needed))
+        }
+        if (ui.readingDrivers) Row(verticalAlignment = Alignment.CenterVertically) {
+            CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp); Spacer(Modifier.width(12.dp))
+            Text(stringResource(R.string.drivers_reading))
+        }
+        ui.driversError?.let { Notice(Icons.Filled.Warning, it, MaterialTheme.colorScheme.error) }
+        FilledTonalButton(onClick = pick, enabled = !ui.readingDrivers) {
+            Text(stringResource(if (folder == null) R.string.drivers_pick else R.string.drivers_change))
+        }
+    }
+}
+
+/** Shown after a Windows write: the fix for Setup's "No drivers were found" on Intel RST/VMD laptops. */
+@Composable
+private fun DriversHelpCard(driversIncluded: Boolean) {
+    androidx.compose.material3.Card(
+        Modifier.fillMaxWidth(),
+        colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
+    ) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Info, null, tint = MaterialTheme.colorScheme.onTertiaryContainer)
+                Spacer(Modifier.width(10.dp))
+                Text(stringResource(R.string.drivers_help_title), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer)
+            }
+            Text(
+                stringResource(if (driversIncluded) R.string.drivers_help_body else R.string.drivers_help_body_none),
+                style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onTertiaryContainer,
+            )
+        }
     }
 }
 
